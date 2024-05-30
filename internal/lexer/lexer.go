@@ -36,6 +36,26 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 
 	switch l.ch {
+	case '+':
+		tok = token.New(token.PLUS, string(l.ch), l.line)
+	case '-':
+		tok = token.New(token.MINUS, string(l.ch), l.line)
+	case '*':
+		tok = token.New(token.ASTERISK, string(l.ch), l.line)
+	case '/':
+		tok = token.New(token.SLASH, string(l.ch), l.line)
+	case ';':
+		tok = token.New(token.SEMICOLON, string(l.ch), l.line)
+	case '(':
+		tok = token.New(token.LPAREN, string(l.ch), l.line)
+	case ')':
+		tok = token.New(token.RPAREN, string(l.ch), l.line)
+	case ',':
+		tok = token.New(token.COMMA, string(l.ch), l.line)
+	case '{':
+		tok = token.New(token.LBRACE, string(l.ch), l.line)
+	case '}':
+		tok = token.New(token.RBRACE, string(l.ch), l.line)
 	case '=':
 		if l.peekChar() == '=' {
 			ch := l.ch
@@ -44,10 +64,6 @@ func (l *Lexer) NextToken() token.Token {
 		} else {
 			tok = token.New(token.ASSIGN, string(l.ch), l.line)
 		}
-	case '+':
-		tok = token.New(token.PLUS, string(l.ch), l.line)
-	case '-':
-		tok = token.New(token.MINUS, string(l.ch), l.line)
 	case '!':
 		if l.peekChar() == '=' {
 			ch := l.ch
@@ -56,10 +72,6 @@ func (l *Lexer) NextToken() token.Token {
 		} else {
 			tok = token.New(token.BANG, string(l.ch), l.line)
 		}
-	case '*':
-		tok = token.New(token.ASTERISK, string(l.ch), l.line)
-	case '/':
-		tok = token.New(token.SLASH, string(l.ch), l.line)
 	case '<':
 		if l.peekChar() == '=' {
 			ch := l.ch
@@ -76,30 +88,14 @@ func (l *Lexer) NextToken() token.Token {
 		} else {
 			tok = token.New(token.GT, string(l.ch), l.line)
 		}
-	case ';':
-		tok = token.New(token.SEMICOLON, string(l.ch), l.line)
-	case '(':
-		tok = token.New(token.LPAREN, string(l.ch), l.line)
-	case ')':
-		tok = token.New(token.RPAREN, string(l.ch), l.line)
-	case ',':
-		tok = token.New(token.COMMA, string(l.ch), l.line)
-	case '{':
-		tok = token.New(token.LBRACE, string(l.ch), l.line)
-	case '}':
-		tok = token.New(token.RBRACE, string(l.ch), l.line)
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
 	default:
 		if isDigit(l.ch) {
-			var num = l.readNumber()
-			tok = token.New(token.INT, num, l.line)
-			return tok
+			return l.readNumber()
 		} else if isAlpha(l.ch) {
-			var ident = l.readIdentifier()
-			tok = token.New(token.LookupIdent(ident), ident, l.line)
-			return tok
+			return l.readIdentifier()
 		} else {
 			tok = token.New(token.ILLEGAL, string(l.ch), l.line)
 		}
@@ -109,20 +105,22 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
-func (l *Lexer) readNumber() string {
+func (l *Lexer) readNumber() token.Token {
 	var position = l.position
 	for isDigit(l.ch) {
 		l.readChar()
 	}
-	return l.input[position:l.position]
+	var scannedNum = l.input[position:l.position]
+	return token.New(token.INT, scannedNum, l.line)
 }
 
-func (l *Lexer) readIdentifier() string {
+func (l *Lexer) readIdentifier() token.Token {
 	var position = l.position
 	for isAlphanumeric(l.ch) {
 		l.readChar()
 	}
-	return l.input[position:l.position]
+	var ident = l.input[position:l.position]
+	return token.New(token.LookupIdent(ident), ident, l.line)
 }
 
 func (l *Lexer) peekChar() byte {
