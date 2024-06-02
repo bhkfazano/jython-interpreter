@@ -2,6 +2,7 @@
 
 ## To Do
 - [ ] Add support for floats
-- [ ] Add support for strings
+- [X] Add support for strings
 - [ ] Add more test cases for the lexer
-- [x] Refactor the NextToken method in the lexer (too chunky)
+- [ ] Add support for comments
+- [X] Refactor the NextToken method in the lexer (too chunky)
