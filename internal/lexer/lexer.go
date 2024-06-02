@@ -1,6 +1,9 @@
 package lexer
 
-import "kogab-interpreter/internal/token"
+import (
+	"fmt"
+	"kogab-interpreter/internal/token"
+)
 
 type Lexer struct {
 	input        string
@@ -130,7 +133,10 @@ func (l *Lexer) readIdentifier() token.Token {
 func (l *Lexer) readString() string {
 	l.readChar()
 	var position = l.position
-	for l.ch != '"' && l.ch != 0 {
+	for l.ch != '"' {
+		if l.ch == 0 {
+			panic("[ERROR] Unexpected EOF while reading string on line " + fmt.Sprint(l.line))
+		}
 		l.readChar()
 	}
 	return l.input[position:l.position]
